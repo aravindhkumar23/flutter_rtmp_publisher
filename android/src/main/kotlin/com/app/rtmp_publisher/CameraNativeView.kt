@@ -246,6 +246,41 @@ class CameraNativeView(
         }
     }
 
+    fun setZoom(zoom:Float) {
+        Log.d("CameraNativeView", "setZoom: $zoom")
+        if (isSurfaceCreated) {
+            try {
+                Log.i("Stuff", "setZoom:  success block  ")
+                rtmpCamera.setZoom(zoom)
+            } catch (e: CameraAccessException) {
+                Log.i("Stuff", "setZoom:  failure block  "+e?.toString())
+                return
+            }
+        }
+    }
+
+    fun getMaxZoomLevel():Double {
+        Log.d("Stuff", "getMaxZoom:")
+            try {
+                Log.i("Stuff", "setZoom:  success block  ")
+                return rtmpCamera.maxZoom.toDouble()
+            } catch (e: CameraAccessException) {
+                Log.i("Stuff", "setZoom:  failure block  "+e?.toString())
+            }
+        return 1.0
+    }
+
+    fun getMinZoomLevel():Double {
+        Log.d("Stuff", "getMinZoomLevel:")
+            try {
+                Log.i("Stuff", "getMinZoomLevel:  success block  ")
+                return rtmpCamera.zoom.toDouble()
+            } catch (e: CameraAccessException) {
+                Log.i("Stuff", "getMinZoomLevel:  failure block  "+e?.toString())
+            }
+        return 0.0
+    }
+
     fun getStreamStatistics(result: MethodChannel.Result) {
         val ret = hashMapOf<String, Any>()
         ret["cacheSize"] = rtmpCamera.cacheSize

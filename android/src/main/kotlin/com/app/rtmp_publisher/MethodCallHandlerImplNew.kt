@@ -13,10 +13,16 @@ import android.util.Log
 import android.view.OrientationEventListener
 import androidx.annotation.RequiresApi
 import com.app.rtmp_publisher.CameraPermissions.ResultCallback
-import io.flutter.plugin.common.*
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
+import com.pedro.rtplibrary.rtmp.RtmpCamera2
 import io.flutter.embedding.engine.FlutterEngine
-import java.util.HashMap
+import io.flutter.plugin.common.BinaryMessenger
+import io.flutter.plugin.common.EventChannel
+import io.flutter.plugin.common.MethodCall
+import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler
+import io.flutter.view.TextureRegistry
+import io.flutter.view.TextureRegistry.SurfaceTextureEntry
+
 
 class MethodCallHandlerImplNew(
         private val activity: Activity,
@@ -154,6 +160,45 @@ class MethodCallHandlerImplNew(
                     getCameraView()?.getStreamStatistics(result)
                 } catch (e: Exception) {
                     handleException(e, result)
+                }
+            }
+            "getMaxZoomLevel" -> {
+                Log.i("Stuff", "getMaxZoomLevel")
+
+                try {
+                    result.success(getCameraView()?.getMaxZoomLevel())
+                } catch (e: Exception) {
+                    handleException(e, result);
+                }
+            }
+            "getMinZoomLevel" -> {
+                Log.i("Stuff", "getMinZoomLevel")
+
+                try {
+                    result.success(getCameraView()?.getMinZoomLevel())
+                } catch (e: Exception) {
+                    handleException(e, result);
+                }
+            }
+            "setZoomLevel" -> {
+                Log.i("Stuff", "setZoomLevel")
+
+                val zoom = call.argument<Double>("zoom");
+                Log.i("Stuff", "setZoomLevel"+zoom)
+
+                if (zoom == null) {
+                    result.error(
+                            "ZOOM_ERROR", "setZoomLevel is called without specifying a zoom level.", null);
+                }
+
+                try {
+                    if (zoom != null) {
+                        getCameraView()?.setZoom(zoom.toFloat())
+                    };
+                    Log.i("Stuff", "try success")
+                } catch (e: Exception) {
+                    Log.i("Stuff", "failure block"+e)
+                    handleException(e, result);
                 }
             }
             "dispose" -> {

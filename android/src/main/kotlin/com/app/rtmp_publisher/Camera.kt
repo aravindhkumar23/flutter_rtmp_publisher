@@ -37,6 +37,8 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.util.*
+import android.graphics.Rect
+import android.hardware.camera2.CameraAccessException
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 class Camera(
