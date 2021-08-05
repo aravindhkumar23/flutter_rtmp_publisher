@@ -17,12 +17,12 @@ public class FlutterRTMPStreaming : NSObject {
     private var retries: Int = 0
     private let eventSink: FlutterEventSink
     private let myDelegate = MyRTMPStreamQoSDelagate()
-    
+
     @objc
     public init(sink: @escaping FlutterEventSink) {
         eventSink = sink
     }
-    
+
     @objc
     public func open(url: String, width: Int, height: Int, bitrate: Int) {
         rtmpStream = RTMPStream(connection: rtmpConnection)
@@ -33,7 +33,7 @@ public class FlutterRTMPStreaming : NSObject {
         ]
         rtmpConnection.addEventListener(.rtmpStatus, selector:#selector(rtmpStatusHandler), observer: self)
         rtmpConnection.addEventListener(.ioError, selector: #selector(rtmpErrorHandler), observer: self)
-        
+
         let uri = URL(string: url)
         self.name = uri?.pathComponents.last
         var bits = url.components(separatedBy: "/")
@@ -68,7 +68,7 @@ public class FlutterRTMPStreaming : NSObject {
             self.rtmpConnection.connect(self.url ?? "frog")
         }
     }
-    
+
     @objc
     private func rtmpStatusHandler(_ notification: Notification) {
         let e = Event.from(notification)
@@ -76,7 +76,7 @@ public class FlutterRTMPStreaming : NSObject {
             return
         }
         print(e)
-        
+
         switch code {
         case RTMPConnection.Code.connectSuccess.rawValue:
             rtmpStream.publish(name)
@@ -98,7 +98,7 @@ public class FlutterRTMPStreaming : NSObject {
             break
         }
     }
-    
+
     @objc
     private func rtmpErrorHandler(_ notification: Notification) {
         if #available(iOS 10.0, *) {
@@ -114,25 +114,25 @@ public class FlutterRTMPStreaming : NSObject {
         rtmpConnection.connect(url!)
         eventSink(["event" : "rtmp_retry",
                    "errorDescription" : "rtmp disconnected"])
-        
+
     }
-    
+
     @objc
     public func pauseVideoStreaming() {
         rtmpStream.paused = true
     }
-    
+
     @objc
     public func resumeVideoStreaming() {
         rtmpStream.paused = false
     }
-    
+
     @objc
     public func isPaused() -> Bool{
         return rtmpStream.paused
     }
-    
-    
+
+
     @objc
     public func getStreamStatistics() -> NSDictionary {
         let ret: NSDictionary = [
@@ -155,7 +155,7 @@ public class FlutterRTMPStreaming : NSObject {
         //ret["isAudioMuted"] = rtmpCamera!!.isAudioMuted
         return ret
     }
-    
+
     @objc
     public func addVideoData(buffer: CMSampleBuffer) {
         if let description = CMSampleBufferGetFormatDescription(buffer) {
@@ -165,7 +165,7 @@ public class FlutterRTMPStreaming : NSObject {
                 .height: dimensions.height,
                 .profileLevel: kVTProfileLevel_H264_Baseline_AutoLevel,
                 .maxKeyFrameIntervalDuration: 2,
-                .bitrate: 1200 * 1024
+                .bitrate: 6000 * 1024
             ]
             rtmpStream.captureSettings = [
                 .fps: 24
@@ -173,12 +173,12 @@ public class FlutterRTMPStreaming : NSObject {
         }
         rtmpStream.appendSampleBuffer( buffer, withType: .video)
     }
-    
+
     @objc
     public func addAudioData(buffer: CMSampleBuffer) {
         rtmpStream.appendSampleBuffer( buffer, withType: .audio)
     }
-    
+
     @objc
     public func close() {
         rtmpConnection.close()
@@ -187,13 +187,13 @@ public class FlutterRTMPStreaming : NSObject {
 
 
 class MyRTMPStreamQoSDelagate: RTMPStreamDelegate {
-    let minBitrate: UInt32 = 300 * 1024
-    let maxBitrate: UInt32 = 2500 * 1024
+    let minBitrate: UInt32 = 6000 * 1024
+    let maxBitrate: UInt32 = 8000 * 1024
     let incrementBitrate: UInt32 = 512 * 1024
-    
+
     func didPublishSufficientBW(_ stream: RTMPStream, withConnection: RTMPConnection) {
         guard let videoBitrate = stream.videoSettings[.bitrate] as? UInt32 else { return }
-        
+
         var newVideoBitrate = videoBitrate + incrementBitrate
         if newVideoBitrate > maxBitrate {
             newVideoBitrate = maxBitrate
@@ -201,12 +201,12 @@ class MyRTMPStreamQoSDelagate: RTMPStreamDelegate {
         print("didPublishSufficientBW update: \(videoBitrate) -> \(newVideoBitrate)")
         stream.videoSettings[.bitrate] = newVideoBitrate
     }
-    
-    
+
+
     // detect upload insufficent BandWidth
     func didPublishInsufficientBW(_ stream:RTMPStream, withConnection:RTMPConnection) {
         guard let videoBitrate = stream.videoSettings[.bitrate] as? UInt32 else { return }
-        
+
         var         newVideoBitrate = UInt32(videoBitrate / 2)
         if newVideoBitrate < minBitrate {
             newVideoBitrate = minBitrate
@@ -214,7 +214,7 @@ class MyRTMPStreamQoSDelagate: RTMPStreamDelegate {
         print("didPublishInsufficientBW update: \(videoBitrate) -> \(newVideoBitrate)")
         stream.videoSettings[.bitrate] = newVideoBitrate
     }
-    
+
     func clear() {
     }
 }

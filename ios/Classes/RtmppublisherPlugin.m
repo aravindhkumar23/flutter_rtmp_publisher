@@ -731,7 +731,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         
         _rtmpStream = [[FlutterRTMPStreaming alloc] initWithSink: _eventSink];
         if (bitrate == nil || bitrate == 0) {
-            bitrate = [NSNumber numberWithInt:160 * 1000];
+            bitrate = [NSNumber numberWithInt:6000 * 1024];
         }
         [_rtmpStream openWithUrl:url width: _streamingSize.width height: _streamingSize.height bitrate: bitrate.integerValue];
         _isStreaming = YES;
