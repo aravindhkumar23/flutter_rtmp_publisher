@@ -72,7 +72,7 @@ class Camera(
     private val aspectRatio: Double = 4.0 / 5.0
 
 //    private val glView: FlutterGLSurfaceView
-    private val glView: LightOpenGlView
+    private val glView: OpenGlView
     private val rtmpCamera: RtmpCamera2
 
     init {
@@ -108,7 +108,7 @@ class Camera(
         streamingProfile = CameraUtils.getBestAvailableCamcorderProfileForResolutionPreset(cameraName, streamPreset)
 
 //        glView = FlutterGLSurfaceView(activity, flutterTexture.surfaceTexture())
-        glView = LightOpenGlView(activity)
+        glView = OpenGlView(activity)
         glView.isKeepAspectRatio = true
         glView.holder.addCallback(this)
 //        glView.setEGLContextClientVersion(2)

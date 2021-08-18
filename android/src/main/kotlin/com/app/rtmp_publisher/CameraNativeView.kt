@@ -16,6 +16,7 @@ import com.pedro.encoder.input.video.CameraHelper.Facing.BACK
 import com.pedro.encoder.input.video.CameraHelper.Facing.FRONT
 import com.pedro.rtplibrary.rtmp.RtmpCamera2
 import com.pedro.rtplibrary.view.LightOpenGlView
+import com.pedro.rtplibrary.view.OpenGlView
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 import net.ossrs.rtmp.ConnectCheckerRtmp
@@ -32,7 +33,7 @@ class CameraNativeView(
         SurfaceHolder.Callback,
         ConnectCheckerRtmp {
 
-    private val glView = LightOpenGlView(activity)
+    private val glView = OpenGlView(activity)
     private val rtmpCamera: RtmpCamera2
 
     private var isSurfaceCreated = false
